@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const path = require('path');
 const stuffRoutes = require('./routes/stuff');
@@ -8,6 +9,7 @@ const app = express();
 
 const port = process.env.PORT;
 
+// CONNECTION TO MONGO
 mongoose.connect(process.env.DB_PATH, {
   dbName: 'node-course',
   useNewUrlParser: true,
@@ -20,6 +22,10 @@ mongoose.connect(process.env.DB_PATH, {
   console.log(err);
 });
 
+// HIDES CERTAIN INFORMATIONS IN THE RESPONSE HEADERS
+app.use(helmet());
+
+// REPLACES BODY-PARSER
 app.use(express.json());
 
 // CORS
@@ -30,7 +36,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// PUBLIC IMG PATH
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
+// ROUTES
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
 
